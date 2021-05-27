@@ -27,23 +27,23 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    
+    nBands=512;
+    mySpectrum=ofSoundGetSpectrum(nBands);
+    width=ofGetWidth()/nBands;
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
-    nBands=512;
-    mySpectrum=ofSoundGetSpectrum(nBands);
-    width=ofGetWidth()/nBands;
+    
+    ofFill();
+    ofSetColor(255);
     for(int i=0;i<nBands;i++){
         posX=ofMap(i,0,nBands,0,ofGetWidth());
-        sizeF=ofMap(mySpectrum[i],0,nBands,2,20);
+        sizeF=ofMap(mySpectrum[i],0,1.5,2,20);
         height=mySpectrum[i]*ofGetHeight();
-     //   ofDrawRectangle(posX,ofGetHeight()/2, width, height);
+    // ofDrawRectangle(posX,ofGetHeight()/2, width, height);
     }
 
-    
     //XYZ
     if(bXyzIsClicked){
         ofSetLineWidth(0.8);
@@ -51,22 +51,24 @@ void ofApp::draw(){
     
         if (points.empty()) {
             bXyzIsClicked = false;
-            
         }
          
         int point_idx=0;
+        int pointsSize=points.size();
         for(int p=0; p<points.size(); p++){
+            
+            int index=ofMap(p,0,pointsSize,0,nBands);
+            float test=mySpectrum[index]*(1+index*1.1)*600;
             xx=ofMap(points[p].x, -6.5, 6.5, 0, ofGetWidth());
             yy=ofMap(points[p].y, -6.5, 6.5, 0, ofGetHeight());
             zz=ofMap(points[p].y, -6.5, 6.5, 0, ofGetHeight());
-            
             
             float blue=ofMap(point_idx,0,10000,90,255);
             float red=ofMap(ofGetMouseX(),0,ofGetWidth(),0,50);
             ofFill();
             ofSetColor(red,blue,255);
-            ofDrawRectangle(xx,yy,zz,sizeF,0.5);
-            ofDrawRectangle(xx,yy,zz,0.5,sizeF);
+            ofDrawRectangle(xx,yy,zz,test,0.5);
+            ofDrawRectangle(xx,yy,zz,0.5,test);
             
             //vector field calculations
             float n = TWO_PI * 10 * ofNoise(points[p].x/divi, points[p].y/divi);
@@ -97,6 +99,7 @@ void ofApp::draw(){
 
             if (points.empty()) {
                 bXyIsClicked = false;}
+
             
             int point_idx=0;
             for(int p=0; p<points.size(); p++){
@@ -109,7 +112,7 @@ void ofApp::draw(){
                 ofSetColor(red,blue,255,200);
                 ofDrawCircle(xx,yy,size);
                 ofFill();
-                ofDrawCircle(xx,yy,0.7);
+                ofDrawCircle(xx,yy,sizeF);
                 
                 //vector field calculations
                 float n = TWO_PI * 3 * ofNoise(points[p].x/divi, points[p].y/divi);
@@ -181,8 +184,8 @@ void ofApp::draw(){
         ofDrawRectangle(butxyz);
         ofDrawRectangle(butxy);
         ofDrawRectangle(butstr);
-        ofDrawBitmapString("XYZ", ofGetWidth()*0.25-5,ofGetHeight()/2-37);
-        ofDrawBitmapString("XY", ofGetWidth()*0.5-10,ofGetHeight()/2-37);
+        ofDrawBitmapString("XY", ofGetWidth()*0.25-5,ofGetHeight()/2-37);
+        ofDrawBitmapString("XYZ", ofGetWidth()*0.5-10,ofGetHeight()/2-37);
         ofDrawBitmapString("strings", ofGetWidth()*0.75-25,ofGetHeight()/2-37);
         ofDrawBitmapString("R for reset", ofGetWidth()/2-40,ofGetHeight()-200);
     }

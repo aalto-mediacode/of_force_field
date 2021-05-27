@@ -31,7 +31,6 @@ class ofApp : public ofBaseApp{
     float xx;
     float yy;
     float zz;
-    ofPolyline line;
     glm::vec2 add;
     
     float size;
