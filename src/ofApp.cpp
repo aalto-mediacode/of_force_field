@@ -2,8 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    mySound.load("Bio-Unit_Network.mp3");
-    mySound.setLoop(true);
+
+  //a sound file must be added here
+  mySound.load("your-audio.mp3");
+  mySound.setLoop(true);
     mySound.play();
     
     ofHideCursor();
@@ -27,7 +29,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    nBands=512;
+    nBands=256;
     mySpectrum=ofSoundGetSpectrum(nBands);
     width=ofGetWidth()/nBands;
 }
@@ -37,12 +39,12 @@ void ofApp::draw(){
     
     ofFill();
     ofSetColor(255);
-    for(int i=0;i<nBands;i++){
-        posX=ofMap(i,0,nBands,0,ofGetWidth());
-        sizeF=ofMap(mySpectrum[i],0,1.5,2,20);
-        height=mySpectrum[i]*ofGetHeight();
-    // ofDrawRectangle(posX,ofGetHeight()/2, width, height);
-    }
+    
+//    for(int i=0;i<nBands;i++){
+//        posX=ofMap(i,0,nBands,0,ofGetWidth());
+//        sizeF=ofMap(mySpectrum[i],0,1.5,2,20);
+//        height=mySpectrum[i]*ofGetHeight();
+//    }
 
     //XYZ
     if(bXyzIsClicked){
@@ -54,11 +56,8 @@ void ofApp::draw(){
         }
          
         int point_idx=0;
-        int pointsSize=points.size();
+
         for(int p=0; p<points.size(); p++){
-            
-            int index=ofMap(p,0,pointsSize,0,nBands);
-            float test=mySpectrum[index]*(1+index*1.1)*600;
             xx=ofMap(points[p].x, -6.5, 6.5, 0, ofGetWidth());
             yy=ofMap(points[p].y, -6.5, 6.5, 0, ofGetHeight());
             zz=ofMap(points[p].y, -6.5, 6.5, 0, ofGetHeight());
@@ -67,8 +66,10 @@ void ofApp::draw(){
             float red=ofMap(ofGetMouseX(),0,ofGetWidth(),0,50);
             ofFill();
             ofSetColor(red,blue,255);
-            ofDrawRectangle(xx,yy,zz,test,0.5);
-            ofDrawRectangle(xx,yy,zz,0.5,test);
+            
+            ofDrawRectangle(xx,yy,zz,size*0.3,0.5);
+            ofDrawRectangle(xx,yy,zz,0.5,size*0.3);
+            
             
             //vector field calculations
             float n = TWO_PI * 10 * ofNoise(points[p].x/divi, points[p].y/divi);
@@ -94,25 +95,35 @@ void ofApp::draw(){
         //XY
     } else if (bXyIsClicked){
         
-        ofSetLineWidth(0.8);
+        ofSetLineWidth(1.8);
         ofBackground(0);
 
             if (points.empty()) {
                 bXyIsClicked = false;}
 
-            
+       
             int point_idx=0;
+            int pointsSize=points.size();
             for(int p=0; p<points.size(); p++){
+                
+                int index=ofMap(p,0,pointsSize,0,nBands);
+                float sizeA=mySpectrum[index]*(1+index*10)*0.6;
+                
                 xx=ofMap(points[p].x, -6.5, 6.5, 0, ofGetWidth());
                 yy=ofMap(points[p].y, -6.5, 6.5, 0, ofGetHeight());
 
-                float blue=ofMap(point_idx,0,10000,100,220);
+                float blue=ofMap(point_idx,0,10000,100,200);
                 float red=ofMap(ofGetMouseX(),0,ofGetWidth(),0,50);
                 ofNoFill();
                 ofSetColor(red,blue,255,200);
+                
+                //non-reactive
                 ofDrawCircle(xx,yy,size);
+                
+                //audio reactive
+                //ofDrawCircle(xx,yy,sizeA);
                 ofFill();
-                ofDrawCircle(xx,yy,sizeF);
+                ofDrawCircle(xx,yy,1.8);
                 
                 //vector field calculations
                 float n = TWO_PI * 3 * ofNoise(points[p].x/divi, points[p].y/divi);
@@ -126,7 +137,6 @@ void ofApp::draw(){
                 }
                 if(yy<30||yy>ofGetHeight()-30){
                     points.erase(points.begin()+p);
-                    cout << speedY << endl;
                 }
                 
                 points[p].x += speedX;
@@ -191,7 +201,7 @@ void ofApp::draw(){
     }
     
     ofSetColor(ofColor::white);
-    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 15);
+    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 10);
     
 }
 
@@ -213,7 +223,10 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-    points.push_back(add);
+    
+    //populate the array on mouse move
+    //points.push_back(add);
+    
     vector_scale=ofMap(ofGetMouseX(),0,ofGetWidth(),-0.03,0.03);
     divi=ofMap(ofGetMouseY(),0,ofGetHeight(),2,30);
     size=ofMap(ofGetMouseY(),0,ofGetHeight(),5,23);
